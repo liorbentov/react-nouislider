@@ -33,6 +33,47 @@ class Nouislider extends React.Component {
     if (this.props.onSlide) {
       slider.on('slide', this.props.onSlide);
     }
+    
+    const handlersElements = this.sliderContainer.querySelectorAll('.noUi-handle');
+    const handlers = [].slice.call(handlersElements);
+
+    handlers.forEach(handle => {
+        handle.setAttribute('tabindex', 0);
+
+        handle.addEventListener('click', function(){
+            this.focus();
+        });
+
+        handle.addEventListener('keydown', function( e ) {
+            const step = slider.options.singleStep;
+
+            // Check if it's a multiple handles
+            if (slider.options.handles > 1) {
+                const currentSliderIndex = e.target.className.indexOf('lower') > -1 ? 0 : 1;
+                const values = slider.get();
+                let value = Number(values[currentSliderIndex]);
+
+                switch ( e.which ) {
+                    case 37: value -= step;
+                        break;
+                    case 39: value += step;
+                        break;
+                }
+
+                values[currentSliderIndex] = value;
+                return slider.set(values);
+            } else {
+                const value = Number(slider.get());
+
+                switch ( e.which ) {
+                    case 37: slider.set( value - step );
+                        break;
+                    case 39: slider.set( value + step );
+                        break;
+                }
+            }
+        });
+    });
   }
 
   render() {
